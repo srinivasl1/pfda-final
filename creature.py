@@ -2,7 +2,7 @@ class Creature():
     def __init__(self, name, size, type, rarity, region):
         self.name = name
         self.size = size #tiny, small, medium, large, giant
-        self.type = type #winged, burrower, quick-footed, strong 
+        self.type = type #winged, burrowers, quick-footed, strong 
         self.rarity = rarity #common, uncommon, rare
         self.region = region
 
