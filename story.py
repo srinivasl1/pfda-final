@@ -1,5 +1,6 @@
 from creature import Creature
 from region import Region
+from area import Area
 
 import time
 
@@ -10,10 +11,15 @@ def main():
     
     global meadow, glade
 
+    meadow, glade = setup()
+    
+    global current_region
+    current_region = meadow
+    global current_area
+    current_area = meadow.areas[0]
+
     global delay
     delay = None
-
-    meadow, glade = setup()
 
     while (delay == None):
         ans = input("Would you like to play with text delays between lines? (Recommended) (Y/N) > ").strip().upper()
@@ -26,6 +32,8 @@ def main():
             
 
     intro()
+
+    game()
 
     success = meadow.find_creature()
     if success:
@@ -55,6 +63,48 @@ def main():
 
     """
 
+def game():
+    ans = ""
+    while ans != "EXIT":
+        print(f"You are in the {current_region.name}.")
+        print(f"{current_area.description}")
+
+        borders = current_area.borders
+
+        valid_directions = []
+
+        for ix in range(len(borders)):
+            if borders[ix] != "X":
+                match ix:
+                    case 0:
+                        valid_directions.append("north")
+                    case 1:
+                        valid_directions.append("east")
+                    case 2:
+                        valid_directions.append("south")
+                    case 3:
+                        valid_directions.append("west")
+
+        valid_dir_initials = [i[0].upper() for i in valid_directions]
+        
+        print(f"You may go {", ".join(valid_directions)}. ({" / ".join(valid_dir_initials)})")
+
+        ans = input(" >>> ").strip().upper()
+        if input in ["N", "E", "S", "W"]:
+            if input not in valid_dir_initials:
+                print("You cannot go that way.")
+
+        else:
+            print("Invalid input!")
+        
+
+
+        
+
+
+
+
+            
 def navigate_bestiary():
         page = 0
         toggle = ""
@@ -95,7 +145,36 @@ def setup():
     #rare
     meadow_animals.append(Creature("Hawk", "medium", "winged", "rare", "meadow"))
 
-    meadow = Region("Meadow", meadow_animals, .8) 
+    meadow_areas = []
+    meadow_areas.append(Area("Grassy Knoll", "Meadow", "Flowery description here", "C", 
+                             [("Meadow","Abandoned Dens"),
+                              ("Meadow","Orchard Valley"),
+                              ("Meadow","Flower Field"),
+                              ("Meadow","Castle Gates")]))
+    meadow_areas.append(Area("Abandoned Dens", "Meadow", "Flowery description here", "N", 
+                             ["X",
+                              "X",
+                              ("Meadow","Grassy Knoll"),
+                              "X"]))
+    meadow_areas.append(Area("Orchard Valley", "Meadow", "Flowery description here", "E", 
+                             ["X",
+                              ("Glade", "Bramble Patch"),
+                              "X",
+                              ("Meadow", "Grassy Knoll")]))
+    meadow_areas.append(Area("Flower Field", "Meadow", "Flowery description here", "S",
+                             [("Meadow", "Grassy Knoll"),
+                              "X",
+                              "X",
+                              "X"]))
+    meadow_areas.append(Area("Castle Gates", "Meadow", "Flowery description here", "W",
+                             ["X",
+                              ("Meadow", "Grassy Knoll"),
+                              "X",
+                              ("Castle", "FirstAreaPlaceholder")]))
+
+    # meadow_areas = ["Grassy Knoll", "Abandoned Dens", "Orchard Valley", "Flower Field", "Castle Gates"]
+
+    meadow = Region("Meadow", meadow_animals, .8, meadow_areas) 
 
 
     glade_animals = []
@@ -112,7 +191,22 @@ def setup():
     #rare
     glade_animals.append(Creature("Stag", "medium", "strong", "rare", "glade"))
 
-    glade = Region("Glade", glade_animals, .6) 
+    glade_areas = []
+    #glade_areas = ["Sunlit Clearing", "Mossy Slope", "Forest Creek", "Woodsman's Hut", "Bramble Patch"]
+    glade_areas.append(Area("Sunlit Clearing", "Glade", "Flowery description here", "C",
+                            []))
+    glade_areas.append(Area("Mossy Slope", "Glade", "Flowery description here", "N",
+                            []))
+    glade_areas.append(Area("Forest Creek", "Glade", "Flowery description here", "E",
+                            []))
+    glade_areas.append(Area("Woodsman's Hut", "Glade", "Flowery description here", "S",
+                            []))
+    glade_areas.append(Area("Bramble Patch", "Glade", "Flowery description here", "W",
+                            []))
+
+
+    glade = Region("Glade", glade_animals, .6, glade_areas) 
+
 
     return meadow, glade # understory, cave, 
 
@@ -138,7 +232,7 @@ def intro():
         """)
     
 
-    print("MEADOW\n--==*==--\n")
+    print(" MEADOW\n--==*==--\n")
     time.sleep(2.0)
 
     """
@@ -175,6 +269,8 @@ def intro():
 
     found = meadow.random_creature()
     bestiary.append(found)
+
+    """
 
     for c in ['.','.','.','.','.']:
         print(c)
@@ -226,12 +322,15 @@ def intro():
     
     navigate_bestiary()
 
+    """
+
     exit_convo = ["Ingram: \"...\"",
                   "Ingram: \"I want to see more creatures like that.\"",
                   "Weld: \"Come on, I bet we'll find more around here!\"",
                   "Weld: \"We might even see some bigger ones down in the forest...\"",
                   "Weld: \"*GASP*... We might even see a baby deer!\"",
-                  "Weld: \"Ingram, we HAVE to go down to the forest!\""]
+                  "Weld: \"Ingram, we HAVE to go down to the forest!\"",
+                  "Weld: \"Let's go! Lead the way!\""]
     
     for line in exit_convo:
         print(line)
