@@ -73,10 +73,11 @@ def game():
 
         if len(current_area.puzzles) != 0: 
             for puzz in current_area.puzzles:
+                print(puzz.is_solved)
                 if puzz.is_solved == False:
-                    print(puzz.description)
+                    print(f"\n{puzz.description}")
                 else:
-                    print(puzz.solved)
+                    print(f"\n{puzz.solved}")
 
 
         ans = input(" >>> ").strip().upper()
@@ -151,9 +152,13 @@ def attempt_find_creature():
             if delay:
                 time.sleep(2.0)
 
-        bestiary.append(found)
 
-        print(f"[{found.name} added to the Bestiary!]")
+        if found not in bestiary:
+            bestiary.append(found)
+            print(f"[{found.name} added to the Bestiary!]")
+        else:
+            print(f"[{found.name} is already in the Bestiary!]")
+
     else:
         foundtext = ["Weld: \"There! I think I see one!\"",
                      "....",
@@ -196,9 +201,14 @@ def navigate_bestiary():
                     toprint.append(f"Weld: \"It's a {bestiary[page].name}, right there!\"")
                     toprint.append(f"Ingram: \"{bestiary[page].name}, could you do us a favor?\"")
                     toprint.append("...")
-                    if (current_area.puzzles[0].answer_type == bestiary[page].type):
+
+                    if (current_area.puzzles[0].is_solved == True):
+                         toprint.append(f"Ingram: \"It says we've already received all the help it can give in this area.\"")
+
+                    elif (current_area.puzzles[0].answer_type == bestiary[page].type):
                         toprint.append(f"Ingram: \"It says it can!\"")
                         toprint.append(current_area.puzzles[0].solving)
+                        current_area.puzzles[0].is_solved = True
                         
                     else:
                         toprint.append(f"Ingram:\"Aww, it says it wouldn't be of much use here. It's a {bestiary[page].type} creature, after all.\"")
@@ -211,6 +221,7 @@ def navigate_bestiary():
                         if delay:
                             time.sleep(2.0)
 
+                toggle == "X"
                 continue
 
             elif toggle == "X":
@@ -267,7 +278,7 @@ def setup():
 
     meadow = Region("Meadow", meadow_animals, .8, meadow_areas) 
 
-    meadow.areas[1].puzzles = [Puzzle("dens", meadow, meadow.areas[1], "Weld:\"Do you think anything could be hiding in those burrows? Ooh, what if there's treasure?\"", "The creature begins to dig itself a new burrow, loose dirt flying through the air as it slips into the earth. In a moment, it returns with a key in its mouth. It deposits the slimey key in Ingram's hand.", "A fresh pile of loosed earth is the only sign of the creature you summoned.", "burrower")]
+    meadow.areas[1].puzzles = [Puzzle("dens", meadow, meadow.areas[1], "Weld: \"Do you think anything could be hiding in those burrows? Ooh, what if there's treasure?\"", "The creature begins to dig itself a new burrow, loose dirt flying through the air as it slips into the earth. In a moment, it returns with a key in its mouth. It deposits the slimey key in Ingram's hand.", "A fresh pile of loosed earth is the only sign of the creature you summoned.", "burrower")]
 
     glade_animals = []
     
