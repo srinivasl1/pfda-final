@@ -13,9 +13,9 @@ def main():
     global bestiary
     bestiary = []
     
-    global meadow, glade
+    global meadow, glade, cave
 
-    meadow, glade = setup()
+    meadow, glade, cave = setup()
     
     global current_region
     current_region = meadow
@@ -43,12 +43,14 @@ def main():
 def game():
     global current_region
     global current_area
-    global meadow, glade
-    regions_dict = {"Meadow":meadow, "Glade":glade}
+    global meadow, glade, cave
+    regions_dict = {"Meadow":meadow, "Glade":glade, "Cave":cave}
 
     ans = ""
     while ans != "EXIT":
         print(f"\n{current_area.description}")
+
+        print(current_area)
 
         borders = current_area.borders
 
@@ -73,7 +75,6 @@ def game():
 
         if len(current_area.puzzles) != 0: 
             for puzz in current_area.puzzles:
-                print(puzz.is_solved)
                 if puzz.is_solved == False:
                     print(f"\n{puzz.description}")
                 else:
@@ -82,6 +83,9 @@ def game():
 
         ans = input(" >>> ").strip().upper()
 
+        new_region = ""
+        new_area = ""
+
         if ans in ["N", "E", "S", "W"]:
             if ans not in valid_dir_initials:
                 print("You cannot go that way.")
@@ -89,25 +93,62 @@ def game():
                 currently_bordering = current_area.borders 
                 match ans:
                     case "N":
-                        current_region = regions_dict[currently_bordering[0][0]]
-                        for i in current_region.areas:
+                        new_region = regions_dict[currently_bordering[0][0]]
+                        for i in new_region.areas:
                             if i.name == currently_bordering[0][1]:
-                                current_area = i
+                                new_area = i
                     case "E":
-                        current_region = regions_dict[currently_bordering[1][0]]
-                        for i in current_region.areas:
+                        new_region = regions_dict[currently_bordering[1][0]]
+                        for i in new_region.areas:
                             if i.name == currently_bordering[1][1]:
-                                current_area = i
+                                new_area = i
                     case "S":
-                        current_region = regions_dict[currently_bordering[2][0]]
-                        for i in current_region.areas:
+                        new_region = regions_dict[currently_bordering[2][0]]
+                        for i in new_region.areas:
                             if i.name == currently_bordering[2][1]:
-                                current_area = i
+                                new_area = i
                     case "W":
-                        current_region = regions_dict[currently_bordering[3][0]]
-                        for i in current_region.areas:
+                        new_region = regions_dict[currently_bordering[3][0]]
+                        for i in new_region.areas:
                             if i.name == currently_bordering[3][1]:
-                                current_area = i
+                                new_area = i
+                
+                if new_area.name == "Mossy Slope" and current_area.name == "Sunlit Clearing":
+                    print(f"\n{new_area.description}")
+
+                    fall_text = ["\nIngram: \"What is this, growing on the rocks?\"",
+                     "Weld: \"It's moss! Isn't it lovely?\"",
+                     "Weld: \"But it's quite a fall from here, so watch your step, or - AAH!\"",
+                     "Weld: \"Oh no! I dropped my pen!\"",
+                     "Weld: \"It's just down there... maybe if I just... reaaachh.......\"",
+                     "Weld: \"AAAAH!!\"",
+                     "Ingram: \"Weld?! WELD! Where did you go?!\"",
+                     "Ingram: \"...Don't leave me up here!\"",
+                     "Ingram: \".....Weld?\"",
+                     "...."]
+                    
+                    
+                    for line in fall_text:
+                        print(line)
+                        if delay:
+                            time.sleep(2.0)
+
+                    print(f"\nYou are now entering THE CAVE.")
+
+                    current_region = cave
+                    current_area = cave.areas[3]
+                    continue
+
+                if new_area.name == "Stone Prison" and glade.areas[3].puzzles[0].is_solved == True and cave.areas[1].puzzles[0].is_solved == False:
+                    cave.areas[1].puzzles[0].is_solved = True
+                    print(cave.areas[1].puzzles[0].solving)
+
+
+                if new_region != current_region:
+                    print(f"\nYou are now entering THE {new_region.name.upper()}")
+                current_region = new_region
+                current_area = new_area
+
         elif ans == "C":
             if current_area.creatures == False:
                 print("This doesn't seem like a good place to search for creatures.")
@@ -312,7 +353,7 @@ def setup():
                              "X",
                              ("Glade", "Sunlit Clearing")],
                             has_creatures=True))
-    glade_areas.append(Area("Woodsman's Hut", "Glade", "Almost hidden in the trees is a small wooden shack. An axe is still wedged in a wide tree stump nearby, and a pile of firewood leans against one of the walls.", "S",
+    glade_areas.append(Area("Woodsman's Hut", "Glade", "Almost hidden amidst the trees is a small wooden shack. A flat stump nearby bears the aged marks of an axe's blade, pile of firewood leans against one of the walls. Wherever the woodsman's axe is, though, it's not here.", "S",
                             [("Glade", "Sunlit Clearing"),
                              "X",
                              "X",
@@ -327,8 +368,60 @@ def setup():
 
     glade = Region("Glade", glade_animals, .6, glade_areas) 
 
+    glade.areas[2].puzzles = [Puzzle("tree", glade, glade.areas[2], "Something flutters from a tree branch overhead, but it's too far up to see what it is, much less to reach.", "The creature flits up into the foliage and out of sight. A moment, then two, and it returns with the item in the trees - a long silk scarf of fabric, in mourning black.\nIngram: \"...This is my mother's.\"\n", "The queen's black scarf was stuck in the trees - she must have been here at some point.", "winged")]
+    glade.areas[3].puzzles = [Puzzle("shed", glade, glade.areas[3], "Ingram: \"This door won't budge. It's all warped in the doorframe. Could we break it open somehow?\"", "The creature takes a few steps back, then barrels right at the shed door. With a loud SLAM, it breaks through the old wood! The creature shakes its head clear of the splinters, then trots off into the trees. Inside the shed, on a narrow workbench, is the woodsman's axe. Weld hefts it in both hands with a grin.", "The door to the little shed is now smashed open. Weld has already taken the axe.", "strong")]
 
-    return meadow, glade # understory, cave, 
+    cave_animals = []
+
+    #CAVE
+    #common
+    cave_animals.append(Creature("Bat", "small", "winged", "common", "cave"))
+    cave_animals.append(Creature("Cricket", "tiny", "quick-footed", "common", "cave"))
+
+    #uncommon
+    cave_animals.append(Creature("Mole", "small", "burrower", "uncommon", "cave"))
+    cave_animals.append(Creature("Salamander", "medium", "quick-footed", "uncommon", "cave"))
+
+    #rare
+    cave_animals.append(Creature("Bear", "medium", "strong", "rare", "cave"))
+
+
+    cave_areas = []
+    
+    cave_areas.append(Area("Underground Pool", "Cave", "A wide cavern opens up ahead, scattered light dancing across every surface. A pool glitters in the center of the cave, gleaming in a few stray beams of sunlight from overhead. Narrow passages delve further into the cave to the north, east, and west.", "C",
+                            [("Cave", "Stone Prison"),
+                             ("Cave", "Bear Den"),
+                             ("Cave", "Cave Mouth"),
+                             ("Cave", "Mushroom Cavern")]))
+    cave_areas.append(Area("Stone Prison", "Cave", "The shadowy passage north is lined with hairline cracks through the stone. Large iron bars are set into the wall of rock ahead of you - creating a prison cell of the cavern. \nIngram: \"What is this place...?\"\n", "N",
+                            ["X",
+                             "X",
+                             ("Cave", "Underground Pool"),
+                             "X"]))
+    cave_areas.append(Area("Bear Den", "Cave", "The air here is musky with the smell of fur. The passage quickly darkens, until the cavern ahead is almost pitch black. In the near silence... a sound like snoring comes from ahead. Best to tread quietly.", "E",
+                            ["X",
+                             "X",
+                             "X",
+                             ("Cave", "Underground Pool")],
+                            has_creatures=True))
+    cave_areas.append(Area("Cave Mouth", "Cave", "The maw of a forest cave opens up ahead, its rocky surface blanketed in slick moss and tall ferns. Daylight ripples across its stone walls, reflected from some pool of water ahead.", "S",
+                            [("Cave", "Underground Pool"),
+                             "X",
+                             ("Glade", "Mossy Slope"),
+                             "X"]))
+    cave_areas.append(Area("Mushroom Cavern", "Cave", "This cavern is full of daylight and smells richly of damp earth and growing things. Fungi of strange shapes and colors grow on rocky outcroppings, creating the image of a small forest.", "W",
+                            ["X",
+                             ("Cave", "Underground Pool"),
+                             "X",
+                             "X"],
+                            has_creatures=True))
+
+
+    cave = Region("Cave", cave_animals, .4, cave_areas) 
+
+    cave.areas[1].puzzles = [Puzzle("tree", cave, cave.areas[1], "The cell is fastened shut by a massive iron lock. It's too dark to see much further into the cell...", "Ingram: \"I have this key from the dens in the field. I think it will fit.\"\nWeld: \"Are you sure we should...? I don't like this place...\"\n.....\nThe key fits the lock, and the cell door groans as it swings open.", "The cell is empty, but the stone walls are scored with deep gouge marks from massive claws. They're layered atop one another, as if something had been trapped here a long time.", "none")]
+
+    return meadow, glade, cave # understory, cave, 
 
 def intro():
     print(rf"""
