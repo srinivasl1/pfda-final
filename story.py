@@ -60,7 +60,7 @@ def game():
             cutscene_status["found_scarf"] = True
             continue
 
-        if (cave.areas[1].puzzles[0].is_solved == True and cutscene_status["found_prison"] == False):
+        if (cave.areas[1].puzzles[0].is_solved == True and cutscene_status["found_prison"] == False and current_area.name != "Stone Prison"):
             found_prison_cutscene()
             cutscene_status["found_prison"] = True
             continue
