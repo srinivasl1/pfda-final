@@ -1,7 +1,7 @@
 # THE BESTIARY
 
 ## Demo
-Demo Video: <URL>
+Demo Video: https://www.youtube.com/watch?v=P8j-ht3aafw
 
 ## GitHub Repository
 GitHub Repo: https://github.com/srinivasl1/pfda-final/
