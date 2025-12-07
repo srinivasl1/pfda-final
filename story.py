@@ -46,11 +46,27 @@ def game():
     global meadow, glade, cave
     regions_dict = {"Meadow":meadow, "Glade":glade, "Cave":cave}
 
+    cutscene_status = {"five_creatures":False, "found_scarf":False, "found_prison":False}
+
     ans = ""
     while ans != "EXIT":
-        print(f"\n{current_area.description}")
+        if (len(bestiary) >= 5 and cutscene_status["five_creatures"] == False):
+            five_creatures_cutscene()
+            cutscene_status["five_creatures"] = True
+            continue
 
-        print(current_area)
+        if (glade.areas[2].puzzles[0].is_solved == True and cutscene_status["found_scarf"] == False):
+            found_scarf_cutscene()
+            cutscene_status["found_scarf"] = True
+            continue
+
+        if (cave.areas[1].puzzles[0].is_solved == True and cutscene_status["found_prison"] == False):
+            found_prison_cutscene()
+            cutscene_status["found_prison"] = True
+            continue
+        
+        
+        print(f"\n{current_area.description}")
 
         borders = current_area.borders
 
@@ -139,7 +155,11 @@ def game():
                     current_area = cave.areas[3]
                     continue
 
-                if new_area.name == "Stone Prison" and glade.areas[3].puzzles[0].is_solved == True and cave.areas[1].puzzles[0].is_solved == False:
+                if new_area.name == "Bramble Patch" and glade.areas[3].puzzles[0].is_solved == True and glade.areas[4].puzzles[0].is_solved == False:
+                    glade.areas[4].puzzles[0].is_solved = True
+                    print(glade.areas[4].puzzles[0].solving)
+
+                if new_area.name == "Stone Prison" and meadow.areas[1].puzzles[0].is_solved == True and cave.areas[1].puzzles[0].is_solved == False:
                     cave.areas[1].puzzles[0].is_solved = True
                     print(cave.areas[1].puzzles[0].solving)
 
@@ -370,6 +390,7 @@ def setup():
 
     glade.areas[2].puzzles = [Puzzle("tree", glade, glade.areas[2], "Something flutters from a tree branch overhead, but it's too far up to see what it is, much less to reach.", "The creature flits up into the foliage and out of sight. A moment, then two, and it returns with the item in the trees - a long silk scarf of fabric, in mourning black.\nIngram: \"...This is my mother's.\"\n", "The queen's black scarf was stuck in the trees - she must have been here at some point.", "winged")]
     glade.areas[3].puzzles = [Puzzle("shed", glade, glade.areas[3], "Ingram: \"This door won't budge. It's all warped in the doorframe. Could we break it open somehow?\"", "The creature takes a few steps back, then barrels right at the shed door. With a loud SLAM, it breaks through the old wood! The creature shakes its head clear of the splinters, then trots off into the trees. Inside the shed, on a narrow workbench, is the woodsman's axe. Weld hefts it in both hands with a grin.", "The door to the little shed is now smashed open. Weld has already taken the axe.", "strong")]
+    glade.areas[4].puzzles = [Puzzle("log", glade, glade.areas[4], "Amidst the brambles is a tall, splintered stump with a gnarled crack in the center. It seems hollow inside, but the crack is too small to fit your hand through.", "Weld hoists her axe, staggering backward briefly under the weight. Then she heaves it over her head, and with a splintering CRACK, the hollow stump splits open. Inside is a gold ring with a black stone. Weld gasps, dropping the axe to grab the ring.", "The stump Weld broke open is now splintered and empty.", "none")]
 
     cave_animals = []
 
@@ -449,7 +470,7 @@ def intro():
     print("\n MEADOW\n--==*==--\n")
     time.sleep(2.0)
 
-    """
+
     
     ingram_intro = ["Ingram: \"Weld.\"",
                       "...",
@@ -479,7 +500,7 @@ def intro():
         if delay:
             time.sleep(2.0)
 
-    """
+
 
     ans = ""
     while ans != "C":
@@ -488,7 +509,7 @@ def intro():
     found = meadow.random_creature()
     bestiary.append(found)
 
-    """
+
 
     for c in ['.','.','.','.','.']:
         print(c)
@@ -555,6 +576,61 @@ def intro():
         if delay:
             time.sleep(2.0)
     
-    """
+
+
+def five_creatures_cutscene():
+    dialogue = ["\nWeld: \"Five whole entries in the bestiary!\"",
+                "Weld: \"I can't wait to show Scribe Fedwren... he'll love these drawings!\"",
+                "Weld: \"I guess we should head back now, though...\"",
+                "Ingram: \"No!\"",
+                "Ingram: \"...I want to keep exploring.\"",
+                "Weld: \"The queen might worry. But you've hardly been coughing all morning!\"",
+                "Weld: \"What is it you're sick with, anyways?\"",
+                "Ingram: \"...I'm not sick.\"",
+                "Weld: \"Come onnnn, you can tell.\"",
+                "Weld: \"Is it flu? Pox? Oh, I hated the pox.\"",
+                "Ingram: \"I'm in poor health. I'm fragile. I'm sensitive to the sun, and to cold winds.\"",
+                "Ingram: \"...I've always been this way.\"",
+                "Weld: \"But look at you! You're in the sun and wind right now!\"",
+                "Weld: \"I didn't like the look of you in the castle. You were all hollow and sickly looking.\"",
+                "Weld: \"But out here you look strong! Like a boy who climbs trees and catches hares!\"",
+                "Ingram: \"...I do?\""]
+    
+    for line in dialogue:
+        print(line)
+        if delay:
+            time.sleep(2.0)
+
+
+def found_scarf_cutscene():
+    dialogue = ["\nWeld: \"...Do you really think that black scarf is the queen's?\"",
+                "Ingram: \"It must be.\"",
+                "Ingram: \"She's the only one who still dresses in black.\"",
+                "Weld: \"What was she doing out here?\"",
+                "Ingram: \"I don't know. She always says these woods are too dangerous to wander alone.\"",
+                "Ingram: \"I hope she wasn't alone.\""]
+
+    for line in dialogue:
+        print(line)
+        if delay:
+            time.sleep(2.0)
+
+def found_prison_cutscene():
+    dialogue = ["\nWeld: \"That prison was really creepy.\"",
+                "Weld: \"Did you see those claw marks in the walls? What could've made them?\"",
+                "Weld: \"Do you think it's a huge creature?!\"",
+                "Weld: \"Maybe we can add it to the bestiary!\"",
+                "Ingram: \"....\"",
+                "Ingram: \"I don't like the idea that my mother was here.\"",
+                "Ingram: \"What if that creature in the prison chased her? Or hurt her?\"",
+                "Weld: \"But we just saw the queen when we were the castle this morning, right?\"",
+                "Weld: \"She seemed fine to me.\"",
+                "Ingram: \"She's good at seeming fine.\"",
+                "Ingram: \"She hides things.\""]
+    
+    for line in dialogue:
+        print(line)
+        if delay:
+            time.sleep(2.0)
 
 main()
