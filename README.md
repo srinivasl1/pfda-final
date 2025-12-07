@@ -11,7 +11,7 @@ GitHub Repo: https://github.com/srinivasl1/pfda-final/
 
 This version is a demo, but the foundations for a full game are there. 
 
-```story.py``` holds the main gameplay logic and written scenes. 
+```project.py``` holds the main gameplay logic and written scenes. 
 
 ```region.py``` defines the Region class. Regions contain a set of unique areas and creatures, with an ascending difficulty for finding creatures the deeper into the map the player ventures.
 
